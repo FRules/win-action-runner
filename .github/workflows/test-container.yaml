@@ -53,28 +53,31 @@ jobs:
 
       - name: Test Visual Studio Build Tools (MSVC compiler & linker)
         run: |
-          docker run --rm "${{ env.IMAGE_NAME }}" cmd /S /C {
-            where cl.exe >nul 2>&1
-            if %errorlevel% equ 0 (
-              echo ✓ MSVC compiler (cl.exe) is available
-              cl.exe
-            ) else (
-              echo ✗ MSVC compiler (cl.exe) NOT found
-              exit /b 1
-            )
+          docker run --rm "${{ env.IMAGE_NAME }}" powershell -Command {
+            $vsBuildToolsRoot = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2022\BuildTools"
+            $cl = Get-ChildItem $vsBuildToolsRoot -Filter cl.exe -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+            if ($cl) {
+              Write-Host "✓ MSVC compiler (cl.exe) found at: $($cl.FullName)"
+              exit 0
+            } else {
+              Write-Host "✗ MSVC compiler (cl.exe) NOT found under $vsBuildToolsRoot"
+              Get-ChildItem $vsBuildToolsRoot -ErrorAction SilentlyContinue | Select-Object Name
+              exit 1
+            }
           }
 
       - name: Test Visual Studio Build Tools - Linker
         run: |
-          docker run --rm "${{ env.IMAGE_NAME }}" cmd /S /C {
-            where link.exe >nul 2>&1
-            if %errorlevel% equ 0 (
-              echo ✓ MSVC linker (link.exe) is available
-              link.exe /?
-            ) else (
-              echo ✗ MSVC linker (link.exe) NOT found
-              exit /b 1
-            )
+          docker run --rm "${{ env.IMAGE_NAME }}" powershell -Command {
+            $vsBuildToolsRoot = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2022\BuildTools"
+            $link = Get-ChildItem $vsBuildToolsRoot -Filter link.exe -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+            if ($link) {
+              Write-Host "✓ MSVC linker (link.exe) found at: $($link.FullName)"
+              exit 0
+            } else {
+              Write-Host "✗ MSVC linker (link.exe) NOT found under $vsBuildToolsRoot"
+              exit 1
+            }
           }
 
       - name: Test Git installation
