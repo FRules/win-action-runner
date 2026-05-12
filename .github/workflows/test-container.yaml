@@ -21,7 +21,7 @@ jobs:
     runs-on: ${{ matrix.runner }}
     env:
       RUNNER_VERSION: 2.331.0
-      IMAGE_NAME: ghcr.io/FRules/win-action-runner:${{ matrix.runner }}-2.331.0
+      IMAGE_NAME: ghcr.io/frules/win-action-runner:${{ matrix.runner }}-2.331.0
 
     permissions:
       contents: read
